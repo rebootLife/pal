@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幻兽帕鲁图鉴 · 全帕鲁信息与生育值查询</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+/* ============ 幻兽帕鲁图鉴 · 冒险日志主题 ============ */
+:root{
+  --sky:#cfe7fb;
+  --sky-deep:#8fc4ef;
+  --paper:#faf4e8;
+  --paper-2:#f3ebda;
+  --cream:#fffdf6;
+  --ink:#2e2921;
+  --ink-2:#6f6655;
+  --ink-3:#9c927f;
+  --line:#e7dbc0;
+  --line-2:#d7c7a4;
+  --red:#e24a3e;
+  --red-deep:#c4382f;
+  --gold:#f2a33c;
+  --gold-deep:#dd8a1c;
+  --blue:#3d9be0;
+  --green:#4fae5f;
+  --shadow:0 5px 18px rgba(98,76,40,.10);
+  --shadow-lg:0 18px 48px rgba(98,76,40,.18);
+  --radius:16px;
+  --font-display:'ZCOOL KuaiLe','ZCOOL QingKe HuangYou','PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  line-height:1.55;
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 520px at 74% -8%, var(--sky) 0%, rgba(207,231,251,0) 58%),
+    radial-gradient(900px 460px at 8% -4%, #eef7ff 0%, rgba(238,247,255,0) 55%),
+    linear-gradient(180deg,#dceefb 0%, #f6efe0 34%, var(--paper) 72%, #f7f0e2 100%);
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+/* 纸张噪点 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.055'/></svg>");
+  mix-blend-mode:multiply;
+}
+/* 漂浮云朵 */
+.cloud{position:fixed;z-index:0;pointer-events:none;background:rgba(255,255,255,.55);border-radius:999px;filter:blur(1px)}
+.cloud.c1{width:180px;height:46px;top:90px;left:6%;animation:drift 34s ease-in-out infinite}
+.cloud.c2{width:130px;height:36px;top:150px;right:10%;animation:drift 42s ease-in-out infinite reverse}
+.cloud.c3{width:90px;height:26px;top:48px;right:28%;animation:drift 28s ease-in-out infinite;animation-delay:-9s}
+@keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(26px)}}
+
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+header, nav.tabs, main, footer{position:relative;z-index:1}
+
+/* ---------- header ---------- */
+header{padding:30px 22px 14px;max-width:1240px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{
+  width:56px;height:56px;border-radius:50%;flex:none;position:relative;
+  background:linear-gradient(to bottom, var(--red) 0 49%, var(--cream) 49% 100%);
+  border:3px solid var(--ink);
+  box-shadow:0 6px 18px rgba(180,50,38,.35), inset 0 0 0 3px rgba(255,255,255,.12);
+  animation:bob 5s ease-in-out infinite;
+}
+.logo::before{
+  content:"";position:absolute;left:0;right:0;top:50%;height:3px;background:var(--ink);transform:translateY(-50%);
+}
+.logo::after{
+  content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:15px;height:15px;border-radius:50%;background:var(--cream);border:3px solid var(--ink);
+}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-3deg)}}
+.brand h1{
+  font-family:var(--font-display);
+  font-size:34px;font-weight:400;letter-spacing:1px;color:var(--ink);line-height:1;
+  text-shadow:0 1px 0 rgba(255,255,255,.6);
+}
+.brand h1 small{font-size:14px;color:var(--ink-2);margin-left:10px;font-family:var(--font-body);letter-spacing:.5px}
+.brand .sub{font-size:13.5px;color:var(--ink-2);margin-top:6px}
+.brand .sub b{color:var(--red)}
+.badge-meta{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,253,246,.7);border:1px solid var(--line);
+  padding:6px 12px;border-radius:999px;font-size:12.5px;color:var(--ink-2);
+  backdrop-filter:blur(4px);box-shadow:var(--shadow);
+}
+.chip b{color:var(--ink)}
+
+/* ---------- tabs ---------- */
+nav.tabs{max-width:1240px;margin:18px auto 0;padding:0 22px;display:flex;gap:8px}
+nav.tabs button{
+  appearance:none;border:2px solid transparent;background:rgba(255,253,246,.55);
+  color:var(--ink-2);padding:11px 20px;border-radius:14px 14px 0 0;
+  font-family:var(--font-display);font-size:16px;cursor:pointer;transition:.18s;
+  position:relative;
+}
+nav.tabs button:hover{color:var(--ink);background:rgba(255,253,246,.85)}
+nav.tabs button.active{
+  background:var(--cream);color:var(--ink);
+  border-color:var(--line);border-bottom-color:var(--cream);
+  box-shadow:0 -6px 18px rgba(98,76,40,.06);
+  transform:translateY(2px);
+}
+nav.tabs button.active::after{
+  content:"";position:absolute;left:20px;right:20px;bottom:-2px;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--red),var(--gold));
+}
+
+main{max-width:1240px;margin:0 auto;padding:20px 22px 46px}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow);
+}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.search{flex:1;min-width:240px;position:relative}
+.search input{
+  width:100%;padding:12px 15px 12px 42px;
+  background:var(--paper);border:2px solid var(--line-2);border-radius:12px;
+  color:var(--ink);font-size:14.5px;outline:none;transition:.15s;font-family:var(--font-body);
+}
+.search input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(61,155,224,.14);background:#fff}
+.search .icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:16px}
+select{
+  padding:11px 13px;background:var(--paper);border:2px solid var(--line-2);
+  border-radius:12px;color:var(--ink);font-size:14px;outline:none;cursor:pointer;min-width:150px;
+  font-family:var(--font-body);
+}
+select:focus{border-color:var(--blue)}
+.btn{
+  padding:11px 18px;border-radius:12px;border:2px solid var(--line-2);
+  background:var(--paper);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;transition:.15s;
+  font-family:var(--font-body);
+}
+.btn:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn.ghost{background:transparent;color:var(--ink-2)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters .label{font-size:13px;color:var(--ink-3);font-weight:700}
+.chip-filter{
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  padding:6px 13px;border-radius:999px;border:2px solid var(--line-2);
+  background:var(--paper);color:var(--ink-2);font-size:13px;user-select:none;transition:.15s;font-weight:600;
+}
+.chip-filter:hover{border-color:var(--gold);color:var(--ink);transform:translateY(-1px)}
+.chip-filter.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+.summary{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:16px 2px 4px;color:var(--ink-2);font-size:13.5px}
+.summary b{color:var(--ink)}
+
+/* ---------- grid & cards ---------- */
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));margin-top:14px}
+.card{
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius);
+  padding:0 0 15px;cursor:pointer;transition:.2s cubic-bezier(.2,.7,.3,1);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:var(--shadow);
+  animation:cardIn .5s cubic-bezier(.2,.7,.3,1) both;
+  animation-delay:calc(min(var(--i,0),40)*16ms);
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.card::after{
+  content:"";position:absolute;left:0;right:0;top:0;height:4px;
+  background:var(--elem, var(--line-2));opacity:.9;
+}
+.card:hover{transform:translateY(-5px);border-color:var(--line-2);box-shadow:var(--shadow-lg)}
+.card:hover .pal-img img{transform:scale(1.08) rotate(-3deg)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:0 15px}
+.no{font-size:12px;color:var(--ink-3);font-weight:800;letter-spacing:.5px}
+.rarity{font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;background:var(--paper);border:1px solid var(--line-2);color:var(--gold-deep)}
+.name-zh{font-family:var(--font-display);font-size:20px;font-weight:400;line-height:1.15;color:var(--ink)}
+.name-en{font-size:12px;color:var(--ink-3);margin-top:2px}
+.card > div:not(.pal-img){padding-left:15px;padding-right:15px;margin-top:9px}
+.card > div.card-top{margin-top:0}
+.elems{display:flex;gap:5px;flex-wrap:wrap}
+.elem{
+  font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;
+  color:#fff;background:var(--ec,#8a8a8a);
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.14);
+}
+.bp-line{
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg, rgba(242,163,60,.14), rgba(242,163,60,.04));
+  border:1px solid rgba(242,163,60,.35);border-radius:11px;padding:9px 12px;
+}
+.bp-line .k{font-size:12px;color:var(--ink-2);font-weight:600}
+.bp-line .v{font-family:var(--font-display);font-size:20px;color:var(--gold-deep)}
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mini{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:6px;text-align:center}
+.mini .k{font-size:10.5px;color:var(--ink-3)}
+.mini .v{font-size:14px;font-weight:800;color:var(--ink)}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:11px;color:var(--ink-2);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink-3);padding:64px 20px;font-size:15px}
+
+/* ---------- pal image ---------- */
+.pal-img{
+  position:relative;border-radius:0 0 14px 14px;overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.9), rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, var(--sky), #f2ead6);
+  border-bottom:1px solid var(--line);margin:0 0 12px;
+}
+.pal-img img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;
+  filter:drop-shadow(0 8px 14px rgba(70,55,30,.28));transition:transform .35s cubic-bezier(.2,.7,.3,1);
+}
+.pal-fallback{position:absolute;inset:0;display:grid;place-items:center;font-size:48px;z-index:0}
+.card-img{height:118px}
+.modal-img{width:68px;height:68px;flex:none;border:1px solid var(--line);border-radius:14px;margin:0}
+.modal-img .pal-fallback{font-size:34px}
+.result-img{width:64px;height:64px;flex:none;border:1px solid var(--line);border-radius:14px;margin:0}
+.result-img .pal-fallback{font-size:32px}
+
+/* ---------- breed ---------- */
+.breed-wrap{max-width:860px;margin:0 auto}
+.breed-panel{
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);
+}
+.breed-panel h2{font-family:var(--font-display);font-size:22px;font-weight:400;letter-spacing:.5px}
+.breed-panel .desc{color:var(--ink-2);font-size:13.5px}
+.combo-row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.combo{flex:1;min-width:220px;position:relative}
+.combo label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:6px;font-weight:700}
+.combo input{
+  width:100%;padding:12px 14px;background:var(--paper);border:2px solid var(--line-2);
+  border-radius:12px;color:var(--ink);font-size:14.5px;outline:none;font-family:var(--font-body);
+}
+.combo input:focus{border-color:var(--blue)}
+.combo-list{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;
+  background:var(--cream);border:1px solid var(--line-2);border-radius:12px;
+  max-height:290px;overflow:auto;box-shadow:var(--shadow-lg);
+}
+.combo-item{padding:10px 13px;cursor:pointer;font-size:14px;display:flex;gap:8px;align-items:center;justify-content:space-between;transition:.1s}
+.combo-item:hover{background:rgba(61,155,224,.1)}
+.combo-item .bp{color:var(--gold-deep);font-size:12.5px;font-weight:800}
+.swap{
+  padding:13px 16px;border-radius:12px;border:2px solid var(--line-2);
+  background:var(--paper);color:var(--ink);cursor:pointer;font-size:17px;transition:.15s;
+}
+.swap:hover{border-color:var(--gold);transform:rotate(180deg)}
+.result{
+  border:2px dashed var(--line-2);border-radius:var(--radius);padding:18px;
+  display:flex;flex-direction:column;gap:12px;min-height:120px;align-items:center;justify-content:center;background:var(--paper);
+}
+.result .empty-txt{color:var(--ink-3);font-size:14px}
+.result-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;width:100%}
+.result-card .big{font-family:var(--font-display);font-size:21px;font-weight:400}
+.formula{
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;
+  padding:13px 15px;font-size:13px;color:var(--ink-2);line-height:1.7;
+}
+.formula code{color:var(--red-deep);background:rgba(226,74,62,.08);padding:1px 7px;border-radius:6px;font-size:12.5px;font-family:ui-monospace,Consolas,monospace}
+
+/* ---------- guide ---------- */
+.guide{display:flex;flex-direction:column;gap:20px}
+.guide-intro{
+  background:linear-gradient(120deg, rgba(61,155,224,.12), rgba(242,163,60,.12));
+  border:1px solid var(--line);border-radius:var(--radius);padding:17px 19px;
+  color:var(--ink-2);font-size:13.5px;line-height:1.7;
+}
+.guide-section{
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;display:flex;flex-direction:column;gap:15px;box-shadow:var(--shadow);
+}
+.guide-section h2{font-family:var(--font-display);font-size:20px;font-weight:400;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.guide-section h2 small{font-size:12.5px;color:var(--ink-3);font-family:var(--font-body)}
+.guide-section h3{font-size:14px;color:var(--ink-2);font-weight:800;margin-top:2px}
+.guide-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
+.g-card{
+  background:var(--paper);border:1px solid var(--line);border-radius:13px;
+  padding:12px;display:flex;gap:11px;align-items:center;cursor:pointer;transition:.16s;
+}
+.g-card:hover{border-color:var(--line-2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.pal-img.g-img{width:54px;height:54px;flex:none;border-radius:11px;margin:0}
+.pal-img.g-img .pal-fallback{font-size:26px}
+.g-card .g-info{flex:1;min-width:0}
+.g-card .g-name{font-family:var(--font-display);font-size:16px;font-weight:400}
+.g-card .g-no{font-size:11.5px;color:var(--ink-3)}
+.g-card .g-note{font-size:12px;color:var(--ink-2);margin-top:3px;line-height:1.45}
+.g-card .g-tag{
+  display:inline-block;font-size:11px;color:var(--red-deep);background:rgba(226,74,62,.09);
+  border:1px solid rgba(226,74,62,.28);border-radius:6px;padding:1px 7px;margin-right:4px;font-weight:700;
+}
+.g-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.g-meta-item{font-size:11.5px;color:var(--ink-2);background:var(--cream);border:1px solid var(--line);border-radius:7px;padding:1px 7px}
+.g-meta-item b{color:var(--ink);font-weight:700;margin-right:3px}
+.passive-box{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:14px}
+.passive-box .pb-title{font-size:13.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.passive-box.after .pb-title{color:var(--gold-deep)}
+.passive-list{display:flex;flex-direction:column;gap:7px}
+.passive-item{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:6px 10px;background:var(--cream);border-radius:8px;border:1px solid var(--line)}
+.passive-item .pn{font-weight:800;white-space:nowrap}
+.passive-item .pe{color:var(--ink-2);text-align:right}
+.guide-note{font-size:12.5px;color:var(--ink-3);line-height:1.6}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px;background:var(--cream)}
+.guide-table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+.guide-table th{background:var(--ink);color:var(--cream);font-weight:700;text-align:left;padding:11px 13px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+.guide-table td{padding:10px 13px;border-bottom:1px solid var(--line);color:var(--ink-2);vertical-align:top;line-height:1.5}
+.guide-table tbody tr:nth-child(even) td{background:rgba(243,235,218,.45)}
+.guide-table tbody tr:last-child td{border-bottom:none}
+.guide-table tbody tr:hover td{background:rgba(61,155,224,.07)}
+.g-link{color:var(--blue);font-weight:700}
+.g-link:hover{text-decoration:underline}
+.guide-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:15px;flex-wrap:wrap}
+.guide-toolbar-hint{font-size:12.5px;color:var(--ink-3)}
+.editable{
+  outline:1px dashed var(--blue);outline-offset:2px;border-radius:4px;
+  padding:0 3px;cursor:text;display:inline-block;min-width:16px;transition:.12s;background:rgba(255,255,255,.5);
+}
+.editable:hover{background:rgba(61,155,224,.1)}
+.editable:focus{outline:2px solid var(--blue);background:rgba(61,155,224,.14)}
+.g-tag.editable{outline-offset:1px}
+
+/* ---------- modal ---------- */
+.modal{
+  position:fixed;inset:0;z-index:100;display:none;
+  background:rgba(46,41,33,.5);backdrop-filter:blur(5px);
+  align-items:flex-start;justify-content:center;padding:4vh 16px;overflow:auto;
+}
+.modal.open{display:flex}
+.modal-card{
+  background:var(--cream);border:1px solid var(--line-2);border-radius:20px;
+  width:100%;max-width:640px;overflow:hidden;animation:pop .22s cubic-bezier(.2,.8,.3,1);
+  box-shadow:var(--shadow-lg);
+}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+.modal-head{
+  padding:20px 22px;display:flex;gap:14px;align-items:flex-start;
+  background:linear-gradient(180deg, #fdf9ef, var(--cream));
+  border-bottom:1px solid var(--line);
+}
+.modal-head .titles{flex:1}
+.modal-head h2{font-family:var(--font-display);font-size:24px;font-weight:400}
+.modal-head .en{font-size:13px;color:var(--ink-3)}
+.close{
+  background:var(--paper);border:1px solid var(--line-2);color:var(--ink-2);
+  width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:16px;flex:none;transition:.15s;
+}
+.close:hover{color:var(--red);border-color:var(--red)}
+.modal-body{padding:20px 22px;display:flex;flex-direction:column;gap:18px}
+.hero-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.hero{
+  background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:13px 15px;
+  display:flex;flex-direction:column;gap:2px;
+}
+.hero.bp{border-color:rgba(242,163,60,.45);background:linear-gradient(120deg, rgba(242,163,60,.14), var(--paper))}
+.hero .k{font-size:12px;color:var(--ink-2)}
+.hero .v{font-family:var(--font-display);font-size:24px;font-weight:400}
+.hero.bp .v{color:var(--gold-deep)}
+.section-title{font-size:13px;font-weight:800;color:var(--ink-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:9px 10px}
+.stat .k{font-size:11px;color:var(--ink-3)}
+.stat .v{font-size:15px;font-weight:800;margin-top:1px}
+.work-list{display:flex;flex-wrap:wrap;gap:7px}
+.work-item{font-size:12.5px;padding:5px 11px;border-radius:9px;background:var(--paper);border:1px solid var(--line);color:var(--ink-2)}
+.work-item b{color:var(--gold-deep);margin-left:5px}
+.gender-bar{display:flex;height:15px;border-radius:8px;overflow:hidden;border:1px solid var(--line-2)}
+.gender-bar .m{background:var(--blue)}
+.gender-bar .f{background:#f06f9a}
+.gender-legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink-2);margin-top:6px}
+
+footer{
+  max-width:1240px;margin:0 auto;padding:20px 22px 44px;
+  color:var(--ink-3);font-size:12.5px;border-top:1px solid var(--line);position:relative;z-index:1;
+}
+footer a{color:var(--ink-2)}
+
+@media(max-width:640px){
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .brand h1{font-size:27px}
+  nav.tabs button{padding:9px 13px;font-size:14px}
+}
+
+</style>
+</head>
+<body>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true"></div>
+    <div>
+      <h1>幻兽帕鲁图鉴<small>Palworld Paldex</small></h1>
+      <div class="sub">全部帕鲁信息 · 属性 · 工作适应性 · <b style="color:var(--accent)">生育值（繁殖力）</b></div>
+    </div>
+    <div class="badge-meta">
+      <span class="chip" id="meta-count"></span>
+      <span class="chip" id="meta-version"></span>
+      <span class="chip" id="meta-build"></span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button id="tab-dex" class="active" onclick="switchTab('dex')">📖 帕鲁图鉴</button>
+  <button id="tab-breed" onclick="switchTab('breed')">🧬 配种计算</button>
+  <button id="tab-guide" onclick="switchTab('guide')">⭐ 推荐攻略</button>
+</nav>
+
+<main>
+  <!-- 图鉴 -->
+  <section id="view-dex">
+    <div class="toolbar">
+      <div class="row">
+        <div class="search">
+          <span class="icon">🔍</span>
+          <input id="search" type="text" placeholder="搜索帕鲁中文名 / 英文名 / 图鉴编号…" autocomplete="off">
+        </div>
+        <select id="sort">
+          <option value="dex">排序：图鉴编号</option>
+          <option value="bp_asc">生育值 低 → 高</option>
+          <option value="bp_desc">生育值 高 → 低</option>
+          <option value="rarity">稀有度 高 → 低</option>
+          <option value="hp">生命 高 → 低</option>
+          <option value="atk">攻击 高 → 低</option>
+          <option value="def">防御 高 → 低</option>
+        </select>
+        <button class="btn ghost" onclick="resetFilters()">重置</button>
+      </div>
+      <div class="filters">
+        <span class="label">属性：</span>
+        <span id="elem-filters"></span>
+      </div>
+      <div class="row">
+        <select id="work-filter">
+          <option value="">工作适应性：全部</option>
+        </select>
+      </div>
+    </div>
+    <div class="summary">
+      <span>显示 <b id="shown-count">0</b> / <b id="total-count">0</b> 只帕鲁</span>
+      <span>生育值范围：<b id="bp-range"></b></span>
+    </div>
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <!-- 配种计算 -->
+  <section id="view-breed" hidden>
+    <div class="breed-wrap">
+      <div class="breed-panel">
+        <h2>🧬 帕鲁配种计算器</h2>
+        <div class="desc">选择两只帕鲁作为父母，查询其后代。结果基于游戏内完整配种矩阵（含特殊配方与性别限定）。</div>
+        <div class="combo-row">
+          <div class="combo" id="combo-a">
+            <label>父母 A</label>
+            <input type="text" placeholder="搜索并选择帕鲁…" autocomplete="off">
+            <div class="combo-list" hidden></div>
+          </div>
+          <button class="swap" onclick="swapParents()" title="交换父母">⇄</button>
+          <div class="combo" id="combo-b">
+            <label>父母 B</label>
+            <input type="text" placeholder="搜索并选择帕鲁…" autocomplete="off">
+            <div class="combo-list" hidden></div>
+          </div>
+        </div>
+        <div id="breed-result" class="result"><span class="empty-txt">请选择两只帕鲁</span></div>
+        <div class="formula">
+          💡 <b>生育值（繁殖力）</b>是配种的核心数值：子代生育值 = <code>⌊(父生育值 + 母生育值 + 1) / 2⌋</code>，系统会选取生育值最接近该结果的帕鲁作为后代。生育值越低，通常代表该帕鲁越稀有、越强大。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 推荐攻略 -->
+  <section id="view-guide" hidden>
+    <div class="guide-toolbar">
+      <button id="guide-edit-btn" class="btn" onclick="toggleGuideEdit()">✏️ 修改</button>
+      <span class="guide-toolbar-hint" id="guide-edit-hint">点击「修改」后可点击页面文字直接编辑</span>
+    </div>
+    <div id="guide" class="guide"></div>
+  </section>
+</main>
+
+<footer>
+  数据来源：<a href="https://github.com/ferretgeek/PalworldBreedingAtlas" target="_blank" rel="noopener">PalworldBreedingAtlas</a>（幻兽帕鲁 1.0 · Steam build 24088745 · 官方正式图鉴 287 只）。
+  本项目为粉丝作品，与 Pocketpair 无关联。所有帕鲁信息（含生育值/繁殖力）仅供参考，请以游戏内数据为准。
+</footer>
+
+<!-- 详情弹窗 -->
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+
+<script src="pals-data.js"></script>
+<script>
+"use strict";
+const DATA = window.PAL_DATA;
+const PALS = DATA.pals;
+const BREED = DATA.breed;
+const ELEMENTS = DATA.elements;
+
+const ELEM_COLOR = {
+  normal:'#9aa3b2', fire:'#f2644a', water:'#4a9df2', leaf:'#55c06a',
+  electricity:'#f2c14e', ice:'#6fd3f2', earth:'#c99b63', dark:'#9a6fd1', dragon:'#8a72f2'
+};
+const ELEM_ICON = {
+  normal:'◯', fire:'🔥', water:'💧', leaf:'🌿', electricity:'⚡', ice:'❄️', earth:'⛰️', dark:'🌙', dragon:'🐉'
+};
+const SIZE_LABEL = {XS:'极小', S:'小', M:'中', L:'大', XL:'特大'};
+
+function numOf(k){ return parseInt(String(k).replace(/B$/,''), 10); }
+function isVariant(k){ return String(k).endsWith('B'); }
+function fmtNo(k){
+  const n = String(numOf(k)).padStart(3,'0');
+  return isVariant(k) ? n+'B' : n;
+}
+function sortKey(k){ return [numOf(k), isVariant(k)?1:0]; }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ---------- state ----------
+let activeElem = new Set();
+let workFilter = '';
+let sortMode = 'dex';
+let query = '';
+
+// ---------- meta ----------
+(function(){
+  const m = DATA.meta;
+  document.getElementById('meta-count').innerHTML = '共 <b>'+PALS.length+'</b> 只帕鲁';
+  document.getElementById('meta-version').innerHTML = '游戏版本 <b>'+esc(m.gameVersion)+'</b>';
+  document.getElementById('meta-build').innerHTML = 'Build <b>'+esc(m.buildId)+'</b>';
+  document.getElementById('total-count').textContent = PALS.length;
+
+  // element filters
+  const wrap = document.getElementById('elem-filters');
+  Object.keys(ELEMENTS).forEach(key => {
+    const zh = ELEMENTS[key];
+    const span = document.createElement('span');
+    span.className = 'chip-filter';
+    span.dataset.elem = key;
+    span.innerHTML = '<span class="dot" style="background:'+ELEM_COLOR[key]+'"></span>'+esc(zh);
+    span.onclick = () => toggleElem(key, span);
+    wrap.appendChild(span);
+  });
+
+  // work filter options
+  const wf = document.getElementById('work-filter');
+  DATA.workTypes.forEach(w => {
+    const o = document.createElement('option');
+    o.value = w; o.textContent = w;
+    wf.appendChild(o);
+  });
+
+  // bp range
+  const bps = PALS.map(p => p.bp);
+  document.getElementById('bp-range').textContent = Math.min(...bps) + ' ~ ' + Math.max(...bps);
+})();
+
+function toggleElem(key, el){
+  if(activeElem.has(key)){ activeElem.delete(key); el.classList.remove('active'); }
+  else{ activeElem.add(key); el.classList.add('active'); }
+  render();
+}
+
+// ---------- filtering / sorting ----------
+function filtered(){
+  const q = query.trim().toLowerCase();
+  let list = PALS.filter(p => {
+    if(activeElem.size && !p.t.some(e => activeElem.has(e))) return false;
+    if(workFilter && !p.work.some(w => w[0] === workFilter)) return false;
+    if(q){
+      const hay = (p.zh + ' ' + p.en + ' ' + fmtNo(p.k) + ' No.' + fmtNo(p.k)).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const cmp = {
+    dex:(a,b)=> (numOf(a.k)-numOf(b.k)) || ((isVariant(a.k)?1:0)-(isVariant(b.k)?1:0)),
+    bp_asc:(a,b)=> a.bp - b.bp,
+    bp_desc:(a,b)=> b.bp - a.bp,
+    rarity:(a,b)=> b.r - a.r,
+    hp:(a,b)=> b.hp - a.hp,
+    atk:(a,b)=> b.atk - a.atk,
+    def:(a,b)=> b.def - a.def,
+  }[sortMode];
+  list.sort(cmp);
+  return list;
+}
+
+// ---------- render ----------
+function elementBadges(t){
+  return t.map(e => {
+    const zh = ELEMENTS[e] || e;
+    return '<span class="elem" style="--ec:'+ELEM_COLOR[e]+'">'+ELEM_ICON[e]+' '+esc(zh)+'</span>';
+  }).join('');
+}
+
+function palImage(p, extraCls){
+  const color = ELEM_COLOR[p.t[0]] || '#555';
+  const emoji = ELEM_ICON[p.t[0]] || '❓';
+  const img = p.img
+    ? '<img src="'+esc(p.img)+'" alt="'+esc(p.zh)+'" loading="lazy" onerror="this.remove()">'
+    : '';
+  return '<div class="pal-img '+(extraCls||'')+'" style="--elem:'+color+'">'+img+'<span class="pal-fallback">'+emoji+'</span></div>';
+}
+
+function render(){
+  const list = filtered();
+  const grid = document.getElementById('grid');
+  document.getElementById('shown-count').textContent = list.length;
+
+  if(!list.length){
+    grid.innerHTML = '<div class="empty">😕 没有符合条件的帕鲁，试试调整筛选条件</div>';
+    return;
+  }
+  grid.innerHTML = list.map((p, i) => {
+    const primary = p.t[0] || 'normal';
+    const color = ELEM_COLOR[primary] || '#555';
+    const rarityTxt = p.r >= 20 ? '传说' : ('稀有度 '+p.r);
+    const noct = p.nocturnal ? '<span class="tag">🌙 夜行</span>' : '';
+    const tags = noct;
+    return '<div class="card" style="--elem:'+color+';--i:'+(i>40?40:i)+'" data-k="'+esc(p.k)+'" onclick="openModal(\''+esc(p.k)+'\')">'
+      + palImage(p, 'card-img')
+      + '<div class="card-top"><span class="no">No.'+fmtNo(p.k)+'</span><span class="rarity">'+rarityTxt+'</span></div>'
+      + '<div><div class="name-zh">'+esc(p.zh)+'</div><div class="name-en">'+esc(p.en)+'</div></div>'
+      + '<div class="elems">'+elementBadges(p.t)+'</div>'
+      + '<div class="bp-line"><span class="k">生育值 · 繁殖力</span><span class="v">'+p.bp+'</span></div>'
+      + '<div class="mini-stats">'
+      + '<div class="mini"><div class="k">生命</div><div class="v">'+p.hp+'</div></div>'
+      + '<div class="mini"><div class="k">攻击</div><div class="v">'+p.atk+'</div></div>'
+      + '<div class="mini"><div class="k">防御</div><div class="v">'+p.def+'</div></div>'
+      + '</div>'
+      + (tags ? '<div class="tags">'+tags+'</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+// ---------- modal ----------
+function openModal(k){
+  const p = PALS.find(x => x.k === k);
+  if(!p) return;
+  const male = Math.round((p.male||0)*100);
+  const female = Math.round((p.female||0)*100);
+  const rarityTxt = p.r >= 20 ? '传说' : p.r;
+  const work = p.work.length
+    ? p.work.map(w => '<span class="work-item">'+esc(w[0])+'<b>Lv.'+w[1]+'</b></span>').join('')
+    : '<span style="color:var(--text3)">无</span>';
+
+  const statRows = [
+    ['生命','hp',''], ['攻击','atk',''], ['防御','def',''],
+    ['工作速度','craft',''], ['移动速度','run','走 '+p.walk+' / 跑 '+p.run],
+    ['骑乘冲刺','ride',''], ['搬运速度','transport',''],
+    ['耐力','stamina',''], ['饱食度上限','stomach',''], ['进食量','food',''],
+    ['价格','price',''], ['体型','size',''], ['野外等级','lv','Lv.'+p.minLv+' ~ '+p.maxLv],
+  ];
+  const statHtml = statRows.map(r => {
+    let val;
+    if(r[1]==='size') val = SIZE_LABEL[p.size] || p.size;
+    else if(r[1]==='lv') val = r[2];
+    else if(r[1]==='run') val = r[2];
+    else val = p[r[1]];
+    return '<div class="stat"><div class="k">'+r[0]+'</div><div class="v">'+val+'</div></div>';
+  }).join('');
+
+  document.getElementById('modal-card').innerHTML =
+    '<div class="modal-head">'
+    + palImage(p, 'modal-img')
+    + '<div class="titles"><h2>'+esc(p.zh)+'</h2><div class="en">'+esc(p.en)+' · No.'+fmtNo(p.k)+'</div>'
+    + '<div class="elems" style="margin-top:8px">'+elementBadges(p.t)+'</div></div>'
+    + '<button class="close" onclick="closeModal()">✕</button>'
+    + '</div>'
+    + '<div class="modal-body">'
+    + '<div class="hero-stats">'
+    + '<div class="hero bp"><span class="k">生育值（繁殖力）</span><span class="v">'+p.bp+'</span></div>'
+    + '<div class="hero"><span class="k">稀有度</span><span class="v">'+rarityTxt+'</span></div>'
+    + '</div>'
+    + '<div><div class="section-title">📊 基础属性</div><div class="stat-grid">'+statHtml+'</div></div>'
+    + '<div><div class="section-title">🛠 工作适应性</div><div class="work-list">'+work+'</div></div>'
+    + '<div><div class="section-title">⚤ 性别比例</div>'
+    + '<div class="gender-bar"><div class="m" style="width:'+male+'%"></div><div class="f" style="width:'+female+'%"></div></div>'
+    + '<div class="gender-legend"><span>♂ 公 '+male+'%</span><span>♀ 母 '+female+'%</span>'
+    + (p.nocturnal ? '<span>🌙 夜行性</span>' : '<span>☀️ 昼行性</span>') + '</div></div>'
+    + '</div>';
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ---------- breed calculator ----------
+const A = makeCombo('combo-a');
+const B = makeCombo('combo-b');
+
+function makeCombo(id){
+  const root = document.getElementById(id);
+  const input = root.querySelector('input');
+  const list = root.querySelector('.combo-list');
+  let selected = null;
+  let items = [];
+
+  function renderList(filter){
+    const q = (filter||'').trim().toLowerCase();
+    items = PALS.filter(p => {
+      if(!q) return true;
+      const hay = (p.zh+' '+p.en+' '+fmtNo(p.k)).toLowerCase();
+      return hay.includes(q);
+    }).slice(0, 60);
+    list.innerHTML = items.map(p =>
+      '<div class="combo-item" data-k="'+esc(p.k)+'"><span>No.'+fmtNo(p.k)+' '+esc(p.zh)+' <span style="color:var(--text3)">'+esc(p.en)+'</span></span><span class="bp">'+p.bp+'</span></div>'
+    ).join('');
+    list.hidden = false;
+    list.querySelectorAll('.combo-item').forEach(el => {
+      el.onmousedown = e => { e.preventDefault(); choose(el.dataset.k); };
+    });
+  }
+  function choose(k){
+    const p = PALS.find(x => x.k === k);
+    if(!p) return;
+    selected = p;
+    input.value = 'No.'+fmtNo(p.k)+'  '+p.zh+'  ('+p.en+')';
+    list.hidden = true;
+    compute();
+  }
+  input.addEventListener('focus', () => renderList(input.value));
+  input.addEventListener('input', () => { selected=null; renderList(input.value); });
+  input.addEventListener('blur', () => setTimeout(()=>list.hidden=true, 120));
+
+  return {
+    get: () => selected,
+    set: (k) => { const p=PALS.find(x=>x.k===k); if(p){ selected=p; input.value='No.'+fmtNo(p.k)+'  '+p.zh+'  ('+p.en+')'; } },
+    clear: () => { selected=null; input.value=''; list.hidden=true; },
+    input,
+  };
+}
+
+function pairKey(a,b){
+  const ka = a.k, kb = b.k;
+  return (numOf(ka) <= numOf(kb)) ? (ka+'|'+kb) : (kb+'|'+ka);
+}
+
+function compute(){
+  const a = A.get(), b = B.get();
+  const box = document.getElementById('breed-result');
+  if(!a || !b){
+    box.innerHTML = '<span class="empty-txt">请选择两只帕鲁</span>';
+    return;
+  }
+  const key = pairKey(a,b);
+  const raw = BREED[key];
+  if(!raw){
+    box.innerHTML = '<span class="empty-txt">⚠️ '+esc(a.zh)+' 与 '+esc(b.zh)+' 无法配种</span>';
+    return;
+  }
+  const results = (Array.isArray(raw) ? raw : [{c:raw, ga:'WILDCARD', gb:'WILDCARD'}]);
+  box.innerHTML = results.map(r => {
+    const child = PALS.find(x => x.k === r.c);
+    if(!child) return '';
+    const color = ELEM_COLOR[child.t[0]] || '#555';
+    // gender note
+    let note = '性别不限';
+    if(r.ga !== 'WILDCARD' || r.gb !== 'WILDCARD'){
+      // map gender relative to a/b order
+      const aIsFirst = (numOf(a.k) <= numOf(b.k));
+      const ga = aIsFirst ? r.ga : r.gb;
+      const gb = aIsFirst ? r.gb : r.ga;
+      const gzh = g => (g==='MALE'?'公':'母');
+      note = a.zh+' 需为'+gzh(ga)+'，'+b.zh+' 需为'+gzh(gb);
+    }
+    const avg = Math.floor((a.bp + b.bp + 1)/2);
+    return '<div class="result-card" style="--elem:'+color+'">'
+      + palImage(child, 'result-img')
+      + '<div style="flex:1;min-width:180px">'
+      + '<div class="big">'+esc(child.zh)+' <span style="color:var(--text3);font-size:13px;font-weight:500">'+esc(child.en)+'</span></div>'
+      + '<div style="font-size:12.5px;color:var(--text3)">No.'+fmtNo(child.k)+' · 生育值 '+child.bp+' · 平均 '+avg+'</div>'
+      + '<div style="margin-top:4px">'+elementBadges(child.t)+'</div>'
+      + '</div>'
+      + '<div style="font-size:12.5px;color:var(--text2);max-width:220px">配种条件：'+esc(note)+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+function swapParents(){
+  const ak = A.get() ? A.get().k : null;
+  const bk = B.get() ? B.get().k : null;
+  if(ak) B.set(ak); else B.clear();
+  if(bk) A.set(bk); else A.clear();
+  compute();
+}
+
+// ---------- 推荐攻略 ----------
+const GUIDE = {
+  intro: '本攻略依据《幻兽帕鲁 前中期推荐帕鲁总表（1.0 正式版）》整理，按人物等级分阶段：前期 1–25 级、中期 26–50 级、后期 50+ 级。点击任意帕鲁卡片可查看详情。',
+  stages: [
+    {name:'前期', range:'1–25 级', desc:'开荒救急 · 坐骑不洗词条 · 战斗宠不投四金'},
+    {name:'中期', range:'26–50 级', desc:'过渡定型 · 开始洗词条、铺配种线'},
+    {name:'后期', range:'50+ 级', desc:'毕业切换 · 双骑士 / 丹烽 / 海皇鲸 / 空涡龙'}
+  ],
+  mounts: {
+    land: [
+      {k:'33',  elem:'无', saddle:9,  speed:'1050', lvl:'5–8级', tag:'前期最快', note:'二号出生点西北火山石台集群刷，野生约10级，普通球即可'},
+      {k:'32',  elem:'草', saddle:12, speed:'900', lvl:'10–14级', note:'草巨兽山陵(172,474)白天刷，二段跳翻丘陵，12级鞍，抓到换猎狼'},
+      {k:'197', elem:'土', saddle:22, speed:'1200（沙地2400）', lvl:'18–24级', note:'沙地提速翻倍，22级鞍；紫霞鹿能用到26级换云海鹿，非必须'},
+      {k:'83',  elem:'水', saddle:26, speed:'1050+二段跳', lvl:'25–30级', tag:'中期毕业', note:'修行者瀑布(-223,-442)洞内BOSS，二段跳+阴云之岚，可洗四金'},
+      {k:'98',  elem:'电', saddle:30, speed:'1150', lvl:'28–32级', note:'北部高地，二段跳电附伤，中期过渡稳，可洗词条沿用'},
+      {k:'199', elem:'暗', saddle:49, speed:'1600+二段跳', lvl:'49+级', tag:'纯速天花板', note:'沙丘深处传送点，同场刷圣光骑士，金球压血10%'},
+      {k:'198', elem:'光', saddle:49, speed:'1400+三段跳', lvl:'49+级', tag:'爬山首选', note:'与混沌骑士同点，三段跳翻断崖神技'}
+    ],
+    fly: [
+      {k:'51',  elem:'无', saddle:15, speed:'750', lvl:'5–14级', note:'初始台地满天飞，野生9–11级，普通/优级球，前期唯一飞行救急'},
+      {k:'64',  elem:'火/暗', saddle:21, speed:'850', lvl:'15–20级', note:'溪谷入口(66,424)，野生11–15级，火暗双属能打'},
+      {k:'63',  elem:'龙', saddle:20, speed:'1000', lvl:'20–25级', note:'初始森林/低山，龙属冲刺1000，夜间好用，比烽歌龙快一档'},
+      {k:'80',  elem:'电', saddle:25, speed:'1100', lvl:'25–30级', note:'北部高地，发光探洞，带闪电球，过渡用'},
+      {k:'96',  elem:'电', saddle:34, speed:'1200', lvl:'30–34级', tag:'前期飞行毕业', note:'北方沙漠/高地，耐力160+搬运3级，可洗神速+永动机'},
+      {k:'188', elem:'火', saddle:38, speed:'1400', lvl:'38–45级', tag:'中期万金油', note:'38级鞍，能边飞边打，烽歌龙×阿努比斯配出来'},
+      {k:'189', elem:'暗', saddle:47, speed:'1600', lvl:'47+级', tag:'空中暗炮台', note:'47级鞍，神圣灾祸倍率180%，中期暗C主战，用到毕业'},
+      {k:'190', elem:'光', saddle:53, speed:'1600', lvl:'53+级', note:'53级鞍，耐力300，能手工/制药，探索采集加工一体'},
+      {k:'171', elem:'龙/暗', saddle:68, speed:'2750', lvl:'68+级', tag:'综合手感最好', note:'68级早熟，队伍叠龙暗增伤，能持枪'},
+      {k:'202', elem:'龙', saddle:79, speed:'3300', lvl:'79+级', tag:'全游极速', note:'极速天花板3300，带导弹，耐力仅100不能持枪，纯赶路玩具'}
+    ],
+    water: [
+      {k:'75',  elem:'水', saddle:16, speed:'900', lvl:'5–15级', note:'剑豪密域(-105,-462)水边，野生15–18级，游泳不耗耐，前期跨河唯一解'},
+      {k:'97',  elem:'水/暗', saddle:31, speed:'1200', lvl:'31–38级', note:'深海区域，耐力320，长途不落地，速度一般'},
+      {k:'121', elem:'水/龙', saddle:40, speed:'1080（冲刺1800）', lvl:'40+级', tag:'中期海骑定型', note:'40级鞍，水面移动不耗耐，水龙双属打combo，一直骑到64级'},
+      {k:'201', elem:'水', saddle:64, speed:'1800（冲刺2000）', lvl:'64+级', tag:'海上唯一真神', note:'空岛左侧孤岛/冰封核心封印realm，跃水越障'}
+    ]
+  },
+  timeline: [
+    {lvl:'5级', action:'开荒三件套', target:'猎狼(陆)+疾风隼(飞)+滑水蛇(水)', ball:'普通球', flag:'三只跳板坐骑到手'},
+    {lvl:'10级', action:'战斗过渡', target:'炎魔羊(盗猎团)+火绒狐', ball:'普通球', flag:'前期输出有兜底'},
+    {lvl:'12级', action:'换陆地坐骑', target:'紫霞鹿替猎狼', ball:'优级球', flag:'二段跳翻丘陵'},
+    {lvl:'15级', action:'换飞行坐骑', target:'烽歌龙替疾风隼', ball:'优级球', flag:'火暗双属能打能飞'},
+    {lvl:'18级', action:'战斗队补远程', target:'羽箭射手入队', ball:'优级球', flag:'打大体积BOSS有主射'},
+    {lvl:'20级', action:'换飞行坐骑', target:'精灵龙替烽歌龙', ball:'优级球', flag:'龙属冲刺1000'},
+    {lvl:'20级', action:'吸血挂件', target:'夜幕魔蝠(夜间森林)', ball:'优级球', flag:'放队里不召唤，5星9%回血'},
+    {lvl:'25级', action:'⭐关键：换陆地毕业', target:'云海鹿(修行者瀑布-223,-442)', ball:'超级球', flag:'中期陆地定型，二段跳'},
+    {lvl:'25级', action:'飞行过渡', target:'雷冥鸟补飞行', ball:'超级球', flag:'发光探洞'},
+    {lvl:'30级', action:'战斗补电系', target:'雷胖达', ball:'超级球', flag:'清群怪+电塔对策'},
+    {lvl:'34级', action:'⭐飞行毕业(前期)', target:'迅雷鸟替精灵龙', ball:'超级球', flag:'耐力160+搬运3级'},
+    {lvl:'38级', action:'飞行升级', target:'荷鲁斯替迅雷鸟', ball:'超级球', flag:'1400冲刺+边飞边打'},
+    {lvl:'40级', action:'⭐换海骑', target:'覆海龙替滑水蛇', ball:'超级球', flag:'水面不耗耐，海骑定型'},
+    {lvl:'47级', action:'⭐暗C主战', target:'异构格里芬', ball:'超级球', flag:'空中暗炮台，用到毕业'},
+    {lvl:'49级', action:'⭐双骑士(陆毕业)', target:'混沌骑士+圣光骑士(沙丘深处)', ball:'传奇球×60', flag:'地面骑战体系成型'},
+    {lvl:'52级', action:'火C过渡', target:'炎煌Alpha(火山)', ball:'传奇球', flag:'等丹烽出来退位'},
+    {lvl:'64级', action:'⭐海骑毕业', target:'海皇鲸(空岛/冰封核心)', ball:'传奇球×60', flag:'海上唯一真神'},
+    {lvl:'68级', action:'飞行升级', target:'灵曦龙', ball:'传奇球', flag:'龙暗增伤，综合手感最好'},
+    {lvl:'79级', action:'⭐全游毕业', target:'空涡龙(龙系主C)', ball:'传奇球×60', flag:'三栖坐骑+战斗全闭环'}
+  ],
+  battle: [
+    {k:'29',  elem:'火', atk:70,  lvl:'5–10级', role:'前期过渡远程火', note:'初始区遍地刷，不培养，纯救急'},
+    {k:'91',  elem:'火/暗', atk:95,  lvl:'10–15级', role:'前期输出天花板', tag:'必抓', note:'新手区盗猎团固定刷1只10级，丹烽配种线起点'},
+    {k:'33',  elem:'无', atk:80,  lvl:'10–15级', role:'前期近战过渡', note:'同陆地坐骑，兼战斗'},
+    {k:'76',  elem:'草', atk:90,  lvl:'15–20级', role:'前期远程主射', note:'弦月湖畔20–25级白天刷，种子地雷打大体积BOSS好用'},
+    {k:'65',  elem:'暗', atk:100, lvl:'20–25级', role:'吸血挂件+制药3', tag:'容错神器', note:'夜间森林刷，5星9%回血，抓一只放基地制药'},
+    {k:'102B', elem:'电', atk:105, lvl:'25–30级', role:'电系控制清群怪', note:'天然路桥区25级，击飞+控制，清近战群怪'},
+    {k:'26',  elem:'火', atk:110, lvl:'30–35级', role:'全队加攻buff', note:'给全队加攻，配合夜幕魔蝠吸血combo'},
+    {k:'85',  elem:'水', atk:115, lvl:'30–40级', role:'中期近战高攻', note:'近战高攻，水属性对策'},
+    {k:'139', elem:'地', atk:125, lvl:'40+级', role:'地系主C+矿工', tag:'平民战神', note:'配种出(烽歌龙×君王美露帕)，47级BOSS别硬抓，挖矿4'},
+    {k:'137', elem:'火', atk:140, lvl:'45+级', role:'火系主C过渡', note:'52级火山Alpha蹲，或配种出，等丹烽出来退主C位'},
+    {k:'189', elem:'暗', atk:130, lvl:'47+级', role:'暗系空中炮台', note:'47级鞍，神圣灾祸倍率180%，中期暗C主战，毕业替补'},
+    {k:'159B', elem:'火', atk:134, lvl:'50+级', role:'火系爆发主C', tag:'毕业火C', note:'铁血卫士满星攻防+210%，配种链末端，双只轮切'},
+    {k:'199', elem:'暗', atk:145, lvl:'49+级', role:'暗系近战副C', note:'49级抓双骑士，二段跳+暗附伤，地面骑战'},
+    {k:'200', elem:'冰', atk:140, lvl:'50+级', role:'冰系主C', note:'钻石星辰高倍+冻结，打火塔无解，神兽态血厚'},
+    {k:'202', elem:'龙', atk:150, lvl:'50+级', role:'龙系综合主C', note:'龙系攻击最高+导弹软控，79级鞍，打暗系BOSS/空战'},
+    {k:'201', elem:'水', atk:145, lvl:'50+级', role:'水系主C+海骑', note:'64级抓，水上不耗耐+跃水越障，海战+长途跨海'}
+  ],
+  workSlots: [
+    {job:'生火', pal:'紫狐娇 + 炽巫猫(光环+1)', elem:'暗+火', native:'Lv4', target:'Lv10(等效Lv11)', note:'暗系夜班，兼手工Lv5搬运Lv2', words:'恶魔之手+卓绝+工匠+不眠'},
+    {job:'浇水', pal:'海月仙 + 海月灵(互促+120%/+50%)', elem:'水/暗', native:'各Lv4', target:'Lv7~8', note:'莉欧·莉涅光环+1可补', words:'暗系四金不眠版'},
+    {job:'手工', pal:'阿努比斯 + 普通塞赫麦特(+40%光环)', elem:'地', native:'Lv6', target:'Lv10', note:'Alpha塞赫麦特数值异常当bug用', words:'恶魔之手+卓绝+工匠+社畜'},
+    {job:'采矿', pal:'阿努比斯(主综合矿工)', elem:'地', native:'Lv6', target:'Lv10(吃4本)', note:'1.0原生Lv6；爆仓补焰煌Lv7/魔渊龙Lv7', words:'非暗四金社畜版'},
+    {job:'播种+采集', pal:'梁叶龙(播种5采集5下田)+花丽娜(播种4下田+全播种光环+1)+春彩娘(生长+70%)+梅莉姆(产量+35%)', elem:'草/暗', native:'梁叶龙Lv5双修', target:'梁叶龙Lv5顶格', note:'四人同农据点，梁叶龙真干双活', words:'暗系四金不眠版'},
+    {job:'发电', pal:'雷鸣鸟(发电4搬运5)', elem:'暗+雷', native:'Lv4', target:'Lv10', note:'暗系夜班，电满顺手搬运；电汪汪光环+1', words:'暗系四金不眠版'},
+    {job:'制药', pal:'黑月女王(制药7→Lv10)+花丽娜(制药4辅做)', elem:'暗+冰', native:'黑月Lv7', target:'Lv10', note:'红菇娘常驻光环全制药+1(配种出)', words:'暗系四金不眠版'},
+    {job:'冷却', pal:'冬丸(冷却2→Lv4~5，暗小体，自身光环全冷却+1)', elem:'暗+冰', native:'Lv2', target:'Lv4~5够用', note:'烟兽晶同型二选一不叠；孵化不靠冷却等级', words:'暗系四金不眠版'},
+    {job:'搬运(通用)', pal:'阿努比斯Lv4 / 雷鸣鸟Lv5 / 灵曦龙Lv6 顺带', elem:'—', native:'—', target:'—', note:'监控台锁工位防乱跑，不单派主位', words:'暗系四金不眠版'},
+    {job:'牧场', pal:'A：骑士蜂×4+波霸牛×2+皮皮鸡×4 / B：薇希×2+趴趴鲶×2+绸笠蛾×3', elem:'—', native:'Lv1即产', target:'不硬冲书', note:'幻悦蝶常驻光环全放牧+1(不占牧场格)', words:'工匠+社畜+认真+不眠'}
+  ],
+  aura: [
+    {pal:{k:'79B'}, effect:'全据点生火+1', obtain:'主岛夜间可抓', always:'是', note:'紫狐娇旁常驻'},
+    {pal:{k:'47'}, effect:'全据点浇水+1', obtain:'主岛可抓', always:'可选', note:'与海月双仙不冲突'},
+    {pal:{k:'89'}, effect:'全据点播种+1', obtain:'第一禁猎区28级', always:'是（兼主位）', note:'农田下田辅播Lv4'},
+    {pal:{k:'62'}, effect:'全据点发电+1', obtain:'主岛可抓', always:'是', note:'雷鸣鸟旁常驻'},
+    {pal:{k:'179'}, effect:'全据点制药+1', obtain:'腾炎龙×狱焰王配种出', always:'是', note:'60前不硬抓野生78级Alpha'},
+    {pal:{k:'149B'}, effect:'全据点冷却+1', obtain:'墨丸+Cryst系配种', always:'是（兼主位）', note:'暗系小体，自身也站Cooler'},
+    {pal:{k:'14'}, effect:'全据点采集+1', obtain:'主岛可抓', always:'可选', note:'梁叶龙已Lv5采集可省'},
+    {pal:{k:'61'}, effect:'全据点放牧+1', obtain:'樱花岛/浮岛40+', always:'是', note:'不占牧场4格'},
+    {pal:{k:'110'}, effect:'配种产蛋+50%', obtain:'30级出头可抓', always:'是（兼主位）', note:'播种5采集5双修'},
+    {pal:{k:'172'}, effect:'孵化+40%', obtain:'主岛可抓', always:'是（孵化据点）', note:'⚠必须装鞍具才触发'},
+    {pal:{k:null, t:'育婴师×1'}, effect:'产蛋+30% / 孵化+30%', obtain:'突变/手术台植入', always:'是', note:'多只产蛋侧不叠，孵化侧微叠'},
+    {pal:{k:'118B'}, effect:'据点SAN不降', obtain:'主岛可抓', always:'是', note:'等价于全员少掉sanity惩罚'}
+  ],
+  wordTemplates: [
+    {target:'暗系/夜班向（紫狐娇/冬丸/黑月女王/海月仙灵/雷鸣鸟/梁叶龙/春彩娘/梅莉姆/灵曦龙暗变）', w1:'恶魔之手 +90%', w2:'卓绝技艺 +75%', w3:'工匠精神 +50%', w4:'不眠(夜行)', total:'≈315%', note:'暗系自带夜班，不眠最值'},
+    {target:'非暗系（阿努比斯/花丽娜/百合女王/紫霞鹿）', w1:'恶魔之手 +90%', w2:'卓绝技艺 +75%', w3:'工匠精神 +50%', w4:'社畜 +30%', total:'≈345%', note:'社畜攻击-30%但打工无伤'},
+    {target:'低成本手术台版（金币可打）', w1:'工匠精神 +50%', w2:'社畜 +30%', w3:'认真 +20%', w4:'不眠', total:'≈200%', note:'术前36级前/没突变蛋时先用这套'},
+    {target:'搬运特化（灵曦龙/雷鸣鸟/阿努比斯）', w1:'神速/运动健将', w2:'次元跳跃', w3:'极限绝食', w4:'不眠', total:'移速向', note:'搬运不看工速词条，看移速词条'}
+  ],
+  roster: [
+    {no:1,  pal:{k:'115'}, role:'生火主位', elem:'暗+火', pos:'农企岛', note:'吃书Lv10，炽巫猫光环等效Lv11'},
+    {no:2,  pal:{k:'79B'}, role:'生火光环+1', elem:'火', pos:'农企岛角落', note:'常驻'},
+    {no:3,  pal:{k:'45'}, role:'浇水主位', elem:'水/暗', pos:'农企岛', note:'与海月灵互促+120%'},
+    {no:4,  pal:{k:'46'}, role:'浇水主位', elem:'水/暗', pos:'农企岛', note:'与海月仙互促+50%'},
+    {no:5,  pal:{k:'47'}, role:'浇水光环+1(可选)', elem:'水', pos:'农企岛角落', note:'与海月双仙不冲突'},
+    {no:6,  pal:{k:'139'}, role:'手工Lv10+采矿Lv10', elem:'地', pos:'手工矿岛', note:'塞赫麦特光环+40%'},
+    {no:7,  pal:{k:'140'}, role:'手工速度光环+40%', elem:'暗', pos:'手工矿岛', note:'Alpha版数值异常当bug'},
+    {no:8,  pal:{k:'186'}, role:'播种替补/制药辅', elem:'草', pos:'农企岛', note:'播种Lv7，配种易出'},
+    {no:9,  pal:{k:'110'}, role:'播种5采集5下田+产蛋+50%', elem:'草', pos:'农企岛/配种岛', note:'四人农田组核心'},
+    {no:10, pal:{k:'89'}, role:'播种4下田+全播种光环+1+制药4辅做', elem:'草', pos:'农企岛', note:'一身三用'},
+    {no:11, pal:{k:'125'}, role:'作物生长+70%光环', elem:'暗', pos:'农企岛', note:'暗系夜班不睡'},
+    {no:12, pal:{k:'147'}, role:'收获量+35%光环', elem:'暗', pos:'农企岛', note:'暗系，与春彩娘不冲突'},
+    {no:13, pal:{k:'80B'}, role:'发电Lv10+搬运Lv5', elem:'暗+雷', pos:'农企岛/工业岛', note:'电满顺手搬运'},
+    {no:14, pal:{k:'62'}, role:'发电光环+1', elem:'电', pos:'工业岛角落', note:'常驻'},
+    {no:15, pal:{k:'186B'}, role:'制药Lv10', elem:'暗+冰', pos:'农企岛', note:'红菇娘光环+1等效Lv11'},
+    {no:16, pal:{k:'179'}, role:'全制药光环+1', elem:'草', pos:'农企岛角落', note:'配种出，60前不硬抓'},
+    {no:17, pal:{k:'149B'}, role:'冷却主位+全冷却光环+1', elem:'暗+冰', pos:'孵化/农企岛', note:'Lv2→Lv4~5够用'},
+    {no:18, pal:{k:'171'}, role:'搬运专职', elem:'龙/暗', pos:'手工矿岛', note:'移速最快搬运'},
+    {no:19, pal:{k:'66'}, role:'牧场(球/箭/金币)', elem:'暗', pos:'牧场岛', note:'暗系小体，终身不造球'},
+    {no:20, pal:{k:'67'}, role:'牧场(蜂蜜)', elem:'虫', pos:'牧场岛', note:'蛋糕线必需'},
+    {no:21, pal:{k:'40'}, role:'牧场(牛奶)', elem:'地', pos:'牧场岛', note:'蛋糕线'},
+    {no:22, pal:{k:'3'}, role:'牧场(蛋)', elem:'无', pos:'牧场岛', note:'蛋糕线'},
+    {no:23, pal:{k:'109'}, role:'牧场(优质帕鲁油)', elem:'水', pos:'牧场岛', note:'工业材料'},
+    {no:24, pal:{k:'116'}, role:'牧场(优质布)', elem:'草', pos:'牧场岛', note:'高级防具材料'},
+    {no:25, pal:{k:'61'}, role:'全放牧光环+1', elem:'虫', pos:'牧场岛角落', note:'不占牧场4格'},
+    {no:26, pal:{k:'172'}, role:'孵化+40%', elem:'雷', pos:'孵化据点', note:'⚠必须装鞍具'},
+    {no:27, pal:{k:null, t:'育婴师×1'}, role:'产蛋+30%/孵化+30%', elem:'—', pos:'配种岛', note:'多只产蛋侧不叠'},
+    {no:28, pal:{k:'118B'}, role:'据点SAN不降', elem:'草', pos:'各据点', note:'等价于全员少掉sanity惩罚'}
+  ],
+  islands: [
+    {island:'农企岛', combo:'紫狐娇+炽巫猫 / 海月双仙+莉欧·莉涅 / 梁叶龙+花丽娜+春彩娘+梅莉姆 / 雷鸣鸟+电汪汪 / 冬丸 / 黑月女王+红菇娘 / 百合女王', device:'熔炼炉×2、农田×4、牧场×2、冰箱×2、Cooler×2', note:'加热器罩生火区，Cooler罩孵化/保鲜区；监控台锁工位'},
+    {island:'手工矿岛', combo:'阿努比斯×2 + 塞赫麦特 / 灵曦龙 / 莉欧·莉涅可补', device:'作业流水线×2、装配线×1、矿山×1', note:'阿努比斯手工+采矿双修，空下来去流水线'},
+    {island:'配种岛', combo:'梁叶龙(产蛋+50%) + 育婴师×1 + 雷云鹫(鞍) + 冬丸顺带', device:'配种牧场×2、孵化器×4、Cooler×2、加热器×2', note:'温度very comfortable才×2速；雷云鹫必须鞍具'},
+    {island:'牧场岛', combo:'薇希+骑士蜂+波霸牛+皮皮鸡+趴趴鲶+绸笠蛾 + 幻悦蝶光环', device:'家畜牧场×2、牧场小屋', note:'幻悦蝶不占牧场4格；搬运靠灵曦龙/雷鸣鸟顺带'}
+  ],
+  replace60: [
+    {from:{k:'139'}, to:{k:'182'}, obtain:'世界树/配种', gain:'手工Lv8原生，暗系不眠'},
+    {from:{k:'115'}, to:{k:'183'}, obtain:'世界树', gain:'生火Lv8原生+手工6'},
+    {from:{k:'45', t:'海月仙灵(浇水4)'}, to:{k:'192'}, obtain:'世界树', gain:'浇水Lv8+采集5'},
+    {from:{k:'149B'}, to:{k:'191'}, obtain:'世界树', gain:'冷却Lv8原生，后期冷冻粉碎机'},
+    {from:{k:'186B'}, to:{k:'193'}, obtain:'世界树', gain:'制药Lv8原生'},
+    {from:{k:'110'}, to:{k:'194'}, obtain:'世界树', gain:'播种Lv8+手工6+制药6，农企全能王'},
+    {from:{k:'152', t:'踏春兔(采集5)已删'}, to:{k:'202'}, obtain:'世界树', gain:'采集Lv8+飞行坐骑'}
+  ],
+  passives: [
+    {type:'陆地坐骑', words:'传说 + 神速 + 运动健将 + 永动机', avoid:'破浪 / 游泳健将', note:'移速+65% 耐力+75%，长途不落地'},
+    {type:'飞行坐骑', words:'传说 + 神速 + 运动健将 + 永动机', avoid:'破浪 / 游泳健将', note:'空涡龙自带传说，杰诺多兰用灵活替传说'},
+    {type:'海上坐骑', words:'传说 + 神速 + 破浪王者 + 游泳健将', avoid:'永动机 / 无限精力', note:'水里不耗耐，永动机纯占格'},
+    {type:'战斗帕鲁', words:'传说 + 脑筋 + 凶猛 + 对应帝王', avoid:'永动机 / 运动健将', note:'帝王=炎帝/冥王/冰帝/神龙/海皇，按属性换'},
+    {type:'丹烽特化', words:'传说 + 脑筋 + 鬼神 + 炎帝', avoid:'永动机 / 运动健将', note:'铁血爆发流，凶猛可换双刃圣剑'}
+  ],
+  ranch: [
+    {k:'66', tag:'球/箭/金币', note:'暗系小体，终身不造球'},
+    {k:'67', tag:'蜂蜜', note:'蛋糕线必需'},
+    {k:'40', tag:'牛奶', note:'蛋糕线'},
+    {k:'3',  tag:'鸡蛋', note:'蛋糕线'},
+    {k:'109', tag:'优质帕鲁油', note:'工业材料'},
+    {k:'116', tag:'优质布', note:'高级防具材料'}
+  ],
+  ranchWords: '牧场帕鲁词条：工匠 + 社畜 + 认真 + 不眠'
+};
+
+let guideEdit = false;
+try {
+  const saved = localStorage.getItem('palworld_guide_v1');
+  if(saved){ Object.assign(GUIDE, JSON.parse(saved)); }
+} catch(e){}
+
+function getPath(o, p){ return p.split('.').reduce((a,k)=>a==null?undefined:a[k], o); }
+function setPath(o, p, v){
+  const ks = p.split('.');
+  let t = o;
+  for(let i=0;i<ks.length-1;i++){
+    if(t[ks[i]] == null) t[ks[i]] = {};
+    t = t[ks[i]];
+  }
+  t[ks[ks.length-1]] = v;
+}
+function updateGuideEditBtn(){
+  const b = document.getElementById('guide-edit-btn');
+  const hint = document.getElementById('guide-edit-hint');
+  if(b) b.innerHTML = guideEdit ? '💾 保存' : '✏️ 修改';
+  if(hint) hint.textContent = guideEdit ? '点击高亮文字直接修改，完成后点「保存」' : '点击「修改」后可点击页面文字直接编辑';
+}
+function toggleGuideEdit(){
+  if(guideEdit){ saveGuide(); }
+  else { guideEdit = true; updateGuideEditBtn(); renderGuide(); }
+}
+function saveGuide(){
+  document.querySelectorAll('#guide [data-edit]').forEach(el => {
+    setPath(GUIDE, el.dataset.edit, el.textContent);
+  });
+  guideEdit = false;
+  updateGuideEditBtn();
+  try { localStorage.setItem('palworld_guide_v1', JSON.stringify(GUIDE)); } catch(e){}
+  renderGuide();
+}
+
+function gCard(k, opts, editBase){
+  const p = PALS.find(x => x.k === k);
+  if(!p) return '';
+  opts = opts || {};
+  let tag = '';
+  if(guideEdit){
+    tag = '<span class="g-tag editable" contenteditable="true" data-edit="'+esc(editBase+'.tag')+'">'+esc(opts.tag||'')+'</span>';
+  } else if(opts.tag){
+    tag = '<span class="g-tag">'+esc(opts.tag)+'</span>';
+  }
+  const meta = (opts.meta || []).map(m => {
+    const val = m[1] == null ? '' : String(m[1]);
+    const valHtml = (guideEdit && m[2])
+      ? '<span class="editable" contenteditable="true" data-edit="'+esc(editBase+'.'+m[2])+'">'+esc(val)+'</span>'
+      : esc(val);
+    return '<span class="g-meta-item"><b>'+esc(m[0])+'</b> '+valHtml+'</span>';
+  }).join('');
+  const note = guideEdit
+    ? '<span class="editable" contenteditable="true" data-edit="'+esc(editBase+'.note')+'">'+esc(opts.note||'')+'</span>'
+    : esc(opts.note||'');
+  const click = guideEdit ? '' : 'onclick="openModal(\''+esc(k)+'\')"';
+  return '<div class="g-card" '+click+'>'
+    + palImage(p, 'g-img')
+    + '<div class="g-info">'
+    + '<div class="g-no">No.'+fmtNo(k)+'</div>'
+    + '<div class="g-name">'+esc(p.zh)+' <span style="color:var(--text3);font-size:12px;font-weight:500">'+esc(p.en)+'</span></div>'
+    + (meta ? '<div class="g-meta">'+meta+'</div>' : '')
+    + '<div class="g-note">'+tag+note+'</div>'
+    + '</div></div>';
+}
+function mountGrid(list, base){
+  return '<div class="guide-grid">'+list.map((x, i) =>
+    gCard(x.k, {tag:x.tag, note:x.note, meta:[['属性',x.elem,'elem'],['鞍具等级',x.saddle,'saddle'],['冲刺速度',x.speed,'speed'],['推荐等级',x.lvl,'lvl']]}, base+'.'+i)
+  ).join('')+'</div>';
+}
+function battleGrid(list, base){
+  return '<div class="guide-grid">'+list.map((x, i) =>
+    gCard(x.k, {tag:x.tag, note:x.note, meta:[['属性',x.elem,'elem'],['攻击种族',x.atk,'atk'],['推荐等级',x.lvl,'lvl'],['定位',x.role,'role']]}, base+'.'+i)
+  ).join('')+'</div>';
+}
+function gCell(v, path){
+  if(v == null) return '';
+  if(typeof v === 'string' || typeof v === 'number'){
+    if(guideEdit && path){
+      return '<span class="editable" contenteditable="true" data-edit="'+esc(path)+'">'+esc(String(v))+'</span>';
+    }
+    return esc(String(v));
+  }
+  if(v.k){
+    const p = PALS.find(x => x.k === v.k);
+    const name = v.t || (p ? p.zh : v.k);
+    if(guideEdit) return esc(name);
+    return '<a class="g-link" href="javascript:void(0)" onclick="openModal(\''+esc(v.k)+'\')">'+esc(name)+'</a>';
+  }
+  return esc(v.t != null ? String(v.t) : '');
+}
+function gTable(headers, rows, wide, edit){
+  let h = '<div class="table-wrap'+(wide?' wide':'')+'"><table class="guide-table"><thead><tr>';
+  h += headers.map(x=>'<th>'+esc(x)+'</th>').join('');
+  h += '</tr></thead><tbody>';
+  h += rows.map((r, ri) => '<tr>'+r.map((c, ci) => {
+    const path = edit ? edit.base+'.'+ri+'.'+edit.fields[ci] : null;
+    return '<td>'+gCell(c, path)+'</td>';
+  }).join('')+'</tr>').join('');
+  h += '</tbody></table></div>';
+  return h;
+}
+function guideSection(title, inner, sub){
+  return '<div class="guide-section"><h2>'+title+(sub ? ' <small>'+sub+'</small>' : '')+'</h2>'+inner+'</div>';
+}
+function editSpan(text, path){
+  const v = text == null ? '' : String(text);
+  if(!guideEdit) return esc(v);
+  return '<span class="editable" contenteditable="true" data-edit="'+esc(path)+'">'+esc(v)+'</span>';
+}
+function renderGuide(){
+  let h = '';
+  h += '<div class="guide-intro">'+editSpan(GUIDE.intro, 'intro')+'</div>';
+  // 阶段说明
+  h += guideSection('📌 阶段划分',
+        '<div class="guide-grid">'+GUIDE.stages.map((s, i) =>
+          '<div class="passive-box"><div class="pb-title">'+editSpan(s.name, 'stages.'+i+'.name')+' <span style="color:var(--text3);font-weight:500">'+editSpan(s.range, 'stages.'+i+'.range')+'</span></div><div class="guide-note">'+editSpan(s.desc, 'stages.'+i+'.desc')+'</div></div>'
+        ).join('')+'</div>');
+  // 坐骑
+  h += guideSection('🐎 陆地坐骑', mountGrid(GUIDE.mounts.land, 'mounts.land'), '按推荐人物等级从低到高');
+  h += guideSection('🦅 飞行坐骑', mountGrid(GUIDE.mounts.fly, 'mounts.fly'));
+  h += guideSection('🚤 水上坐骑', mountGrid(GUIDE.mounts.water, 'mounts.water'));
+  // 等级执行顺序
+  h += guideSection('🗺️ 按等级执行顺序',
+        gTable(['人物等级','优先做什么','抓谁','用球','完成标志'],
+          GUIDE.timeline.map(t=>[t.lvl, t.action, t.target, t.ball, t.flag]), true,
+          {base:'timeline', fields:['lvl','action','target','ball','flag']}));
+  // 战斗
+  h += guideSection('⚔️ 战斗帕鲁', battleGrid(GUIDE.battle, 'battle'), '按推荐人物等级与定位');
+  // 工作
+  h += guideSection('🏭 据点工作帕鲁（工种）',
+        gTable(['工种','主工位帕鲁','属性','原生等级','吃书目标','关键说明','词条模板'],
+          GUIDE.workSlots.map(w=>[w.job, w.pal, w.elem, w.native, w.target, w.note, w.words]), true,
+          {base:'workSlots', fields:['job','pal','elem','native','target','note','words']}),
+        '60级前可获取 · 面板Lv10封顶+光环等效 · 偏暗系小体向');
+  h += guideSection('💡 光环挂件（角落常驻，同种1只）',
+        gTable(['挂件帕鲁','光环效果','获取方式','是否常驻','备注'],
+          GUIDE.aura.map(a=>[a.pal, a.effect, a.obtain, a.always, a.note]), true,
+          {base:'aura', fields:['pal','effect','obtain','always','note']}));
+  h += guideSection('🏷️ 工作词条模板（四金，加法叠加）',
+        gTable(['适用对象','词条1','词条2','词条3','词条4','合计工速','备注'],
+          GUIDE.wordTemplates.map(w=>[w.target, w.w1, w.w2, w.w3, w.w4, w.total, w.note]), true,
+          {base:'wordTemplates', fields:['target','w1','w2','w3','w4','total','note']}));
+  h += guideSection('📋 最小常驻编制（去重，直接照抄）',
+        gTable(['序号','帕鲁','角色','属性','据点位置','备注'],
+          GUIDE.roster.map(r=>[r.no, r.pal, r.role, r.elem, r.pos, r.note]), true,
+          {base:'roster', fields:['no','pal','role','elem','pos','note']}));
+  h += guideSection('🏝️ 分岛摆放建议',
+        gTable(['据点','帕鲁组合','核心设备','关键提醒'],
+          GUIDE.islands.map(i=>[i.island, i.combo, i.device, i.note]), true,
+          {base:'islands', fields:['island','combo','device','note']}));
+  h += guideSection('🔁 60级后单只替换路线',
+        gTable(['原帕鲁','替换目标','获取方式','提升点'],
+          GUIDE.replace60.map(r=>[r.from, r.to, r.obtain, r.gain]), true,
+          {base:'replace60', fields:['from','to','obtain','gain']}), '底层架构不拆');
+  // 牧场
+  h += guideSection('🏡 牧场帕鲁',
+        '<div class="guide-grid">'+GUIDE.ranch.map((x, i)=>gCard(x.k, {tag:x.tag, note:x.note}, 'ranch.'+i)).join('')+'</div>'
+        + '<div class="guide-note" style="margin-top:10px">'+editSpan(GUIDE.ranchWords, 'ranchWords')+' · 幻悦蝶常驻光环全放牧+1（不占牧场格）</div>',
+        '按产出物选择');
+  // 毕业词条
+  h += guideSection('🏷️ 毕业词条速查',
+        gTable(['类型','四金词条','绝对别带','说明'],
+          GUIDE.passives.map(p=>[p.type, p.words, p.avoid, p.note]), true,
+          {base:'passives', fields:['type','words','avoid','note']}),
+        '四金 = 四个毕业被动词条');
+  document.getElementById('guide').innerHTML = h;
+}
+
+// ---------- tab switch ----------
+function switchTab(t){
+  document.getElementById('tab-dex').classList.toggle('active', t==='dex');
+  document.getElementById('tab-breed').classList.toggle('active', t==='breed');
+  document.getElementById('tab-guide').classList.toggle('active', t==='guide');
+  document.getElementById('view-dex').hidden = (t!=='dex');
+  document.getElementById('view-breed').hidden = (t!=='breed');
+  document.getElementById('view-guide').hidden = (t!=='guide');
+}
+
+// ---------- events ----------
+document.getElementById('search').addEventListener('input', e => { query = e.target.value; render(); });
+document.getElementById('sort').addEventListener('change', e => { sortMode = e.target.value; render(); });
+document.getElementById('work-filter').addEventListener('change', e => { workFilter = e.target.value; render(); });
+function resetFilters(){
+  query = ''; document.getElementById('search').value = '';
+  activeElem.clear();
+  document.querySelectorAll('.chip-filter').forEach(el => el.classList.remove('active'));
+  workFilter = ''; document.getElementById('work-filter').value = '';
+  sortMode = 'dex'; document.getElementById('sort').value = 'dex';
+  render();
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// init
+render();
+renderGuide();
+updateGuideEditBtn();
+</script>
+</body>
+</html>
