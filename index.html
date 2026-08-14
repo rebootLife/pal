@@ -279,6 +279,15 @@ select:focus{border-color:var(--blue)}
   padding:11px 14px;background:var(--paper);border:2px solid var(--line-2);
   border-radius:12px;color:var(--ink);font-size:14.5px;outline:none;font-family:var(--font-body);cursor:pointer;
 }
+.multi-exclude{display:flex;flex-direction:column;gap:6px}
+.multi-check{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2);cursor:pointer;font-weight:600}
+.multi-check input[type=checkbox]{width:17px;height:17px;cursor:pointer;accent-color:var(--blue)}
+.multi-check input[type=number]{
+  width:92px;padding:7px 10px;background:var(--paper);border:2px solid var(--line-2);
+  border-radius:9px;color:var(--ink);font-size:13.5px;outline:none;font-family:var(--font-body);
+}
+.multi-check input[type=number]:focus{border-color:var(--blue)}
+.multi-exclude-hint{font-size:12px;color:var(--ink-3);line-height:1.5}
 .multi-fixed-wrap{display:flex;flex-direction:column;gap:10px}
 .multi-fixed-wrap:empty{display:none}
 .multi-fixed-title{font-size:13px;color:var(--ink-2);font-weight:800}
@@ -542,6 +551,16 @@ footer a{color:var(--ink-2)}
             <option value="3" selected>3 代</option>
             <option value="4">4 代</option>
           </select>
+        </div>
+
+        <div class="multi-exclude">
+          <label class="multi-check">
+            <input type="checkbox" id="multi-exclude-toggle">
+            <span>排除繁育值低于</span>
+            <input type="number" id="multi-exclude-bp" value="150" min="0" max="3080" step="10">
+            <span>的帕鲁</span>
+          </label>
+          <div class="multi-exclude-hint">勾选后，繁育值低于该数值的帕鲁（通常越稀有）将不作为配种对象或中间结果。</div>
         </div>
 
         <div id="multi-fixed-wrap" class="multi-fixed-wrap"></div>
@@ -843,6 +862,9 @@ const BREED_INDEX = {};
   }
 })();
 
+const BP_MAP = {};
+PALS.forEach(p => { BP_MAP[p.k] = p.bp; });
+
 const multiTarget = makeCombo('multi-target');
 const multiStartA = makeCombo('multi-start-a');
 const multiStartB = makeCombo('multi-start-b');
@@ -869,10 +891,17 @@ function rebuildMultiFixed(){
   }
 }
 
-function searchMultiPaths(startKey, startBKey, targetKey, maxGens, fixed){
+function searchMultiPaths(startKey, startBKey, targetKey, maxGens, fixed, excludeBp){
   const paths = [];
   const queue = [];
   const visited = {};
+
+  const excluded = k => {
+    if(excludeBp == null) return false;
+    if(k === targetKey || k === startKey || k === startBKey) return false;
+    const bp = BP_MAP[k];
+    return bp != null && bp < excludeBp;
+  };
 
   const gen1 = [];
   if(startBKey){
@@ -882,10 +911,14 @@ function searchMultiPaths(startKey, startBKey, targetKey, maxGens, fixed){
       cs.forEach(c => gen1.push({ b: startBKey, c }));
     }
   } else {
-    (BREED_INDEX[startKey] || []).forEach(e => e.children.forEach(c => gen1.push({ b: e.partner, c })));
+    (BREED_INDEX[startKey] || []).forEach(e => {
+      if(excluded(e.partner)) return;
+      e.children.forEach(c => gen1.push({ b: e.partner, c }));
+    });
   }
 
   for(const g1 of gen1){
+    if(maxGens > 1 && excluded(g1.c)) continue;
     const steps = [{ gen: 1, a: startKey, b: g1.b, c: g1.c }];
     if(maxGens === 1){
       if(g1.c === targetKey) paths.push(steps);
@@ -908,7 +941,10 @@ function searchMultiPaths(startKey, startBKey, targetKey, maxGens, fixed){
         cs.forEach(c => cands.push({ b: fPartner, c }));
       }
     } else {
-      (BREED_INDEX[cur] || []).forEach(e => e.children.forEach(c => cands.push({ b: e.partner, c })));
+      (BREED_INDEX[cur] || []).forEach(e => {
+        if(excluded(e.partner)) return;
+        e.children.forEach(c => cands.push({ b: e.partner, c }));
+      });
     }
 
     for(const cd of cands){
@@ -916,6 +952,7 @@ function searchMultiPaths(startKey, startBKey, targetKey, maxGens, fixed){
       if(nextGen === maxGens){
         if(cd.c === targetKey) paths.push(newSteps);
       } else {
+        if(excluded(cd.c)) continue;
         (visited[nextGen] = visited[nextGen] || {});
         const cnt = visited[nextGen][cd.c] || 0;
         if(cnt < 5){
@@ -980,7 +1017,14 @@ function searchMulti(){
     if(p) fixed[f.gen] = p.k;
   }
 
-  const paths = searchMultiPaths(startA.k, startB ? startB.k : null, target.k, gens, fixed);
+  const excludeToggle = document.getElementById('multi-exclude-toggle');
+  let excludeBp = null;
+  if(excludeToggle && excludeToggle.checked){
+    const v = parseInt(document.getElementById('multi-exclude-bp').value, 10);
+    if(v > 0) excludeBp = v;
+  }
+
+  const paths = searchMultiPaths(startA.k, startB ? startB.k : null, target.k, gens, fixed, excludeBp);
 
   if(!paths.length){
     box.innerHTML = '<span class="empty-txt">😕 未找到从 '+esc(startA.zh)+(startB ? ' × '+esc(startB.zh) : '')+' 经过 '+gens+' 代配出 '+esc(target.zh)+' 的路径。试试增加代数，或调整中间固定配种对象。</span>';
