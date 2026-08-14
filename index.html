@@ -269,6 +269,37 @@ select:focus{border-color:var(--blue)}
 }
 .formula code{color:var(--red-deep);background:rgba(226,74,62,.08);padding:1px 7px;border-radius:6px;font-size:12.5px;font-family:ui-monospace,Consolas,monospace}
 
+/* ---------- multi-gen breed ---------- */
+.breed-panel + .breed-panel{margin-top:18px}
+#multi-panel > .combo{flex:none;width:100%}
+.multi-fixed-wrap .combo{flex:none;width:100%}
+.multi-field{display:flex;flex-direction:column;gap:6px;max-width:320px}
+.multi-field label{font-size:12.5px;color:var(--ink-2);font-weight:700}
+.multi-field select{
+  padding:11px 14px;background:var(--paper);border:2px solid var(--line-2);
+  border-radius:12px;color:var(--ink);font-size:14.5px;outline:none;font-family:var(--font-body);cursor:pointer;
+}
+.multi-fixed-wrap{display:flex;flex-direction:column;gap:10px}
+.multi-fixed-wrap:empty{display:none}
+.multi-fixed-title{font-size:13px;color:var(--ink-2);font-weight:800}
+.multi-actions{display:flex;gap:10px;flex-wrap:wrap}
+.multi-result{display:flex;flex-direction:column;gap:14px;min-height:80px}
+.multi-summary{font-size:13px;color:var(--ink-2)}
+.multi-summary b{color:var(--gold-deep)}
+.multi-path{
+  background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:14px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.multi-path-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.multi-path-head .idx{font-family:var(--font-display);font-size:15px;color:var(--gold-deep);font-weight:400}
+.multi-step{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2)}
+.multi-step .gen-tag{flex:none;font-size:11px;font-weight:800;color:var(--cream);background:var(--ink);border-radius:6px;padding:2px 8px}
+.multi-step .arrow{color:var(--ink-3);font-weight:800}
+.multi-pal{display:inline-flex;align-items:center;gap:5px;font-weight:700;color:var(--ink)}
+.multi-pal .bp-chip{color:var(--gold-deep);font-size:11.5px;font-weight:800}
+.multi-pal.hit{color:var(--red-deep)}
+.multi-step .eq{color:var(--ink-3);font-weight:800;margin:0 2px}
+
 /* ---------- guide ---------- */
 .guide{display:flex;flex-direction:column;gap:20px}
 .guide-intro{
@@ -478,6 +509,49 @@ footer a{color:var(--ink-2)}
         <div class="formula">
           💡 <b>生育值（繁殖力）</b>是配种的核心数值：子代生育值 = <code>⌊(父生育值 + 母生育值 + 1) / 2⌋</code>，系统会选取生育值最接近该结果的帕鲁作为后代。生育值越低，通常代表该帕鲁越稀有、越强大。
         </div>
+      </div>
+
+      <div class="breed-panel" id="multi-panel">
+        <h2>🔁 多代配种规划</h2>
+        <div class="desc">指定「目标帕鲁」与「起始帕鲁」，自动推演经过若干代配种得到目标的所有路径。起始可只选 1 只（第 1 代与任意帕鲁配种）或选 2 只（第 1 代由它们直接配出）；中间代可选择性固定配种对象（留空 = 任意）。</div>
+
+        <div class="combo" id="multi-target">
+          <label>🎯 目标帕鲁（必选）</label>
+          <input type="text" placeholder="搜索并选择目标帕鲁…" autocomplete="off">
+          <div class="combo-list" hidden></div>
+        </div>
+
+        <div class="combo-row">
+          <div class="combo" id="multi-start-a">
+            <label>🌱 起始帕鲁 A（必选）</label>
+            <input type="text" placeholder="搜索并选择起始帕鲁…" autocomplete="off">
+            <div class="combo-list" hidden></div>
+          </div>
+          <div class="combo" id="multi-start-b">
+            <label>🌱 起始帕鲁 B（可选 · 留空则任意）</label>
+            <input type="text" placeholder="可留空，留空则与任意帕鲁配" autocomplete="off">
+            <div class="combo-list" hidden></div>
+          </div>
+        </div>
+
+        <div class="multi-field">
+          <label for="multi-gens">配种代数（步骤数）</label>
+          <select id="multi-gens">
+            <option value="1">1 代</option>
+            <option value="2">2 代</option>
+            <option value="3" selected>3 代</option>
+            <option value="4">4 代</option>
+          </select>
+        </div>
+
+        <div id="multi-fixed-wrap" class="multi-fixed-wrap"></div>
+
+        <div class="multi-actions">
+          <button class="btn" onclick="searchMulti()">🔍 搜索路径</button>
+          <button class="btn ghost" onclick="clearMulti()">清空</button>
+        </div>
+
+        <div id="multi-result" class="multi-result"><span class="empty-txt">设置目标与起始帕鲁后，点击「搜索路径」</span></div>
       </div>
     </div>
   </section>
@@ -704,8 +778,7 @@ function closeModal(){
 const A = makeCombo('combo-a');
 const B = makeCombo('combo-b');
 
-function makeCombo(id){
-  const root = document.getElementById(id);
+function createCombo(root, onChange){
   const input = root.querySelector('input');
   const list = root.querySelector('.combo-list');
   let selected = null;
@@ -732,10 +805,10 @@ function makeCombo(id){
     selected = p;
     input.value = 'No.'+fmtNo(p.k)+'  '+p.zh+'  ('+p.en+')';
     list.hidden = true;
-    compute();
+    if(onChange) onChange(p);
   }
   input.addEventListener('focus', () => renderList(input.value));
-  input.addEventListener('input', () => { selected=null; renderList(input.value); });
+  input.addEventListener('input', () => { selected=null; renderList(input.value); if(onChange) onChange(null); });
   input.addEventListener('blur', () => setTimeout(()=>list.hidden=true, 120));
 
   return {
@@ -745,11 +818,190 @@ function makeCombo(id){
     input,
   };
 }
+function makeCombo(id, onChange){
+  return createCombo(document.getElementById(id), onChange);
+}
 
 function pairKey(a,b){
   const ka = a.k, kb = b.k;
   return (numOf(ka) <= numOf(kb)) ? (ka+'|'+kb) : (kb+'|'+ka);
 }
+
+function breedKeyOf(aKey, bKey){
+  return (numOf(aKey) <= numOf(bKey)) ? (aKey+'|'+bKey) : (bKey+'|'+aKey);
+}
+
+// ---------- 多代配种规划 ----------
+const BREED_INDEX = {};
+(function(){
+  for(const key of Object.keys(BREED)){
+    const [a, b] = key.split('|');
+    const val = BREED[key];
+    const children = Array.isArray(val) ? val.map(x => x.c) : [val];
+    (BREED_INDEX[a] = BREED_INDEX[a] || []).push({ partner: b, children });
+    if(a !== b) (BREED_INDEX[b] = BREED_INDEX[b] || []).push({ partner: a, children });
+  }
+})();
+
+const multiTarget = makeCombo('multi-target');
+const multiStartA = makeCombo('multi-start-a');
+const multiStartB = makeCombo('multi-start-b');
+let multiFixedCombos = [];
+
+function rebuildMultiFixed(){
+  const gens = parseInt(document.getElementById('multi-gens').value, 10) || 3;
+  const wrap = document.getElementById('multi-fixed-wrap');
+  wrap.innerHTML = '';
+  multiFixedCombos = [];
+  if(gens <= 1) return;
+  const title = document.createElement('div');
+  title.className = 'multi-fixed-title';
+  title.textContent = '🔒 中间代固定配种对象（可选 · 留空 = 任意）';
+  wrap.appendChild(title);
+  for(let g = 2; g <= gens; g++){
+    const div = document.createElement('div');
+    div.className = 'combo';
+    div.innerHTML = '<label>第 '+g+' 代的配种对象（可选）</label>'
+      + '<input type="text" placeholder="可留空，留空则与任意帕鲁配" autocomplete="off">'
+      + '<div class="combo-list" hidden></div>';
+    wrap.appendChild(div);
+    multiFixedCombos.push({ gen: g, combo: createCombo(div) });
+  }
+}
+
+function searchMultiPaths(startKey, startBKey, targetKey, maxGens, fixed){
+  const paths = [];
+  const queue = [];
+  const visited = {};
+
+  const gen1 = [];
+  if(startBKey){
+    const raw = BREED[breedKeyOf(startKey, startBKey)];
+    if(raw){
+      const cs = Array.isArray(raw) ? raw.map(x => x.c) : [raw];
+      cs.forEach(c => gen1.push({ b: startBKey, c }));
+    }
+  } else {
+    (BREED_INDEX[startKey] || []).forEach(e => e.children.forEach(c => gen1.push({ b: e.partner, c })));
+  }
+
+  for(const g1 of gen1){
+    const steps = [{ gen: 1, a: startKey, b: g1.b, c: g1.c }];
+    if(maxGens === 1){
+      if(g1.c === targetKey) paths.push(steps);
+    } else {
+      queue.push({ cur: g1.c, steps, gen: 1 });
+    }
+  }
+
+  while(queue.length && paths.length < 2000){
+    const { cur, steps, gen } = queue.shift();
+    if(gen >= maxGens) continue;
+    const nextGen = gen + 1;
+    const fPartner = fixed[nextGen] || null;
+
+    const cands = [];
+    if(fPartner){
+      const raw = BREED[breedKeyOf(cur, fPartner)];
+      if(raw){
+        const cs = Array.isArray(raw) ? raw.map(x => x.c) : [raw];
+        cs.forEach(c => cands.push({ b: fPartner, c }));
+      }
+    } else {
+      (BREED_INDEX[cur] || []).forEach(e => e.children.forEach(c => cands.push({ b: e.partner, c })));
+    }
+
+    for(const cd of cands){
+      const newSteps = steps.concat([{ gen: nextGen, a: cur, b: cd.b, c: cd.c }]);
+      if(nextGen === maxGens){
+        if(cd.c === targetKey) paths.push(newSteps);
+      } else {
+        (visited[nextGen] = visited[nextGen] || {});
+        const cnt = visited[nextGen][cd.c] || 0;
+        if(cnt < 5){
+          visited[nextGen][cd.c] = cnt + 1;
+          queue.push({ cur: cd.c, steps: newSteps, gen: nextGen });
+        }
+      }
+    }
+  }
+
+  const seen = new Set();
+  const unique = [];
+  for(const p of paths){
+    const sig = p.map(s => s.a+'|'+s.b+'|'+s.c).join('>');
+    if(!seen.has(sig)){ seen.add(sig); unique.push(p); }
+  }
+  return unique;
+}
+
+function palChip(p, isHit){
+  const name = p ? p.zh : '未知';
+  const bp = p ? p.bp : '?';
+  return '<span class="multi-pal'+(isHit?' hit':'')+'">'+esc(name)+' <span class="bp-chip">'+bp+'</span></span>';
+}
+
+function renderMultiPath(steps, idx){
+  const stepHtml = steps.map(s => {
+    const pa = PALS.find(x => x.k === s.a);
+    const pb = PALS.find(x => x.k === s.b);
+    const pc = PALS.find(x => x.k === s.c);
+    const isHit = s.gen === steps.length;
+    return '<div class="multi-step">'
+      + '<span class="gen-tag">第'+s.gen+'代</span>'
+      + palChip(pa, false)
+      + '<span class="eq">×</span>'
+      + palChip(pb, false)
+      + '<span class="eq">=</span>'
+      + palChip(pc, isHit)
+      + '</div>';
+  }).join('');
+  return '<div class="multi-path">'
+    + '<div class="multi-path-head"><span class="idx">路径 '+idx+'</span><span style="font-size:12px;color:var(--ink-3)">共 '+steps.length+' 代</span></div>'
+    + stepHtml
+    + '</div>';
+}
+
+function searchMulti(){
+  const box = document.getElementById('multi-result');
+  const target = multiTarget.get();
+  const startA = multiStartA.get();
+  const startB = multiStartB.get();
+  const gens = parseInt(document.getElementById('multi-gens').value, 10) || 3;
+
+  if(!target || !startA){
+    box.innerHTML = '<span class="empty-txt">请先选择「目标帕鲁」和「起始帕鲁 A」</span>';
+    return;
+  }
+
+  const fixed = {};
+  for(const f of multiFixedCombos){
+    const p = f.combo.get();
+    if(p) fixed[f.gen] = p.k;
+  }
+
+  const paths = searchMultiPaths(startA.k, startB ? startB.k : null, target.k, gens, fixed);
+
+  if(!paths.length){
+    box.innerHTML = '<span class="empty-txt">😕 未找到从 '+esc(startA.zh)+(startB ? ' × '+esc(startB.zh) : '')+' 经过 '+gens+' 代配出 '+esc(target.zh)+' 的路径。试试增加代数，或调整中间固定配种对象。</span>';
+    return;
+  }
+
+  const show = paths.slice(0, 200);
+  const summary = '<div class="multi-summary">共找到 <b>'+paths.length+'</b> 条路径'+(paths.length > 200 ? '（仅显示前 200 条）' : '')+'</div>';
+  box.innerHTML = summary + show.map((steps, i) => renderMultiPath(steps, i+1)).join('');
+}
+
+function clearMulti(){
+  multiTarget.clear();
+  multiStartA.clear();
+  multiStartB.clear();
+  multiFixedCombos.forEach(f => f.combo.clear());
+  document.getElementById('multi-result').innerHTML = '<span class="empty-txt">设置目标与起始帕鲁后，点击「搜索路径」</span>';
+}
+
+rebuildMultiFixed();
+document.getElementById('multi-gens').addEventListener('change', rebuildMultiFixed);
 
 function compute(){
   const a = A.get(), b = B.get();
